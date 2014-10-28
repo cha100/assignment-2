@@ -123,6 +123,8 @@ private:
 	//Include any helper functions here
 	//e.g. trimming whitespace, comment processing
 
+	//write out the functions for deleting comments and trimming whitespaces.
+	
 	//Computes a new tokenLength for the next token
 	//Modifies: size_t tokenLength, and bool complete
 	//(Optionally): may modify offset
@@ -131,8 +133,16 @@ private:
 	
 public:
 	//Default Constructor- YOU need to add the member variable initializers.
-	Tokenizer() : processingInlineComment(false), processingBlockComment(false), processingIncludeStatement(false), complete(false), offset(0), tokenLength(0), str(NULL) 
-	{ /*Add initializers */ };
+	Tokenizer()
+	{  
+		processingInlineComment = false;
+		processingBlockComment = false;
+		processingIncludeStatement = false; 
+		complete = false;
+		offset;
+		tokenLength; 
+		str = NULL;
+	};
 
 	//Sets the current string to be tokenized
 	//Resets all Tokenizer state variables

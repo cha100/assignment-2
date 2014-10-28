@@ -70,27 +70,25 @@ void TokenList::deleteToken(Token *token)
 	}
 	
 	//Head
-	else if(prev==NULL)
+	else if(token == head)
 	{
 		token->next->prev = NULL; //sets the next tokens previous link to null
 		head = token->next; //sets the head to the next token
 		delete token; //deletes the node
 	}
 	
-	//Body
-	else if(prev!=NULL && next!=NULL)
-	{
-		token->prev -> next = token ->next; //sets the previous tokens next link to the next link of the current node
-		token->next->prev = token->prev; //sets the next nodes previous link to the previous link of the current node
-		delete token; //deletes the node
-	}
-	
-	
 	//Tail
-	else if (next == NULL)
+	else if (token == tail)
 	{
 		token->prev->next = NULL; //makes the next link of the previous node null
 		tail = token->prev; // sets the tail to be the previous node
+		delete token; //deletes the node
+	}
+	//Body
+	else
+	{
+		token->prev -> next = token ->next; //sets the previous tokens next link to the next link of the current node
+		token->next->prev = token->prev; //sets the next nodes previous link to the previous link of the current node
 		delete token; //deletes the node
 	}
 	
@@ -116,4 +114,3 @@ void Tokenizer::setString(string *str) { }
 //Updates offset, resets tokenLength, updates processingABC member variables
 //Calls Tokenizer::prepareNextToken() as the last statement before returning.
 string Tokenizer::getNextToken() { }
-

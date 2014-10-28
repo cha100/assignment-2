@@ -151,7 +151,9 @@ public:
 
 	//Returns true if all possible tokens have been extracted from the current string (string *str)
 	bool isComplete() const 
-	{ /*Fill in implementation */ }
+	{ /*Fill in implementation */ 
+		return complete;
+	}
 
 	//Returns the next token. Hint: consider the substr function
 	//Updates the tokenizer state

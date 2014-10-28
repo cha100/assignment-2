@@ -1,3 +1,4 @@
+
 #ifndef PARSERCLASSES_H_
 #define PARSERCLASSES_H_
 
@@ -52,19 +53,19 @@ public:
 	//Sets the Token's *prev member
 	void setPrev (Token* prev )
 	{
-		this -> prev = prev;
+		this -> prev = prev; //this operator is a pointer which points to itself
 	}
 
 	//Returns a reference to the Token's stringRep member variable
 	const string& getStringRep ( ) const 
 	{
-		return (this -> stringRep); //*****************************DAVE***********
+		return (this -> stringRep); //returns a pointer pointing the address of stringRep
 	}
 
 	//Sets the token's stringRep variable
 	void setStringRep (const string& stringRep ) 
 	{ 
-		next->stringRep = stringRep; //************************DAVE HELP**************
+		next->stringRep = stringRep; //sets the value of the next token
 	}
 };
 
@@ -81,19 +82,20 @@ public:
 	//Returns a pointer to the head of the list
 	Token* getFirst() const 
 	{
-		this-> head  = head;  //******************************
+		return head;  //points to the head of the list
 	}
 
 	//Returns a pointer to the tail of the list
 	Token* getLast() const 
 	{
-		this-> tail = tail;
+		return tail;  //points to the tail of this list
 	}
 
 	//Creates a new token for the string input, str
 	//Appends this new token to the TokenList
 	//On return from the function, it will be the last token in the list
-	void append(const string &str); //example comment
+	void append(const string &str);	//example comment
+	
 
 	//Appends the token to the TokenList if not null
 	//On return from the function, it will be the last token in the list
@@ -129,7 +131,8 @@ private:
 	
 public:
 	//Default Constructor- YOU need to add the member variable initializers.
-	Tokenizer() : { /*Add initializers */ }
+	Tokenizer() : processingInlineComment(false), processingBlockComment(false), processingIncludeStatement(false), complete(false), offset(0), tokenLength(0), str(NULL) 
+	{ /*Add initializers */ };
 
 	//Sets the current string to be tokenized
 	//Resets all Tokenizer state variables
@@ -137,7 +140,8 @@ public:
 	void setString(string *str);
 
 	//Returns true if all possible tokens have been extracted from the current string (string *str)
-	bool isComplete() const { /*Fill in implementation */ }
+	bool isComplete() const 
+	{ /*Fill in implementation */ }
 
 	//Returns the next token. Hint: consider the substr function
 	//Updates the tokenizer state
@@ -150,3 +154,4 @@ public:
 
 
 #endif /* PARSERCLASSES_H_ */
+

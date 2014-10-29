@@ -122,46 +122,21 @@ private:
 
 	//Include any helper functions here
 	//e.g. trimming whitespace, comment processing
-	int isLibrary()
-	{
-		if(*str.at(offset) == "<" && (*str).at(offset+1)!=" ") //checks for < and the next character, if its not a space, searches for the cllosing >
-		{
-			tokenLength = find_first_of( ">", offset)
-			//what happens if not found
-		}
-		
-		for(int *i = str.at(offset); i < str.at(offset+tokenLength); i++) // checks all the characters searching for ;. if none found returns token length, change value of tokenLenght to 0
-		{
-			if(*i == ";")
-			{
-				tokenLength = 0;;
-			}
-		}
-		
-		return tokenLength;
-	}
-
+	
 	void isWhitespace()
 	{
-		while ((*str).at (offset) == " " && offset< *str.length())
+		while ( offset < str -> length() && (str->at (offset) == ' '|| str->at (offset) == ' \t'))
 		{
 			offset++;
 		}
 	}
+
 
 	void isComment()
 	{
 		if(*str.at(offset) == "/" && (*str).at(offset+1)!="/") //Not sure how to implement this.
 	}
 	
-	int isHeader()
-	{
-		if(*str.at(offset) == "\"" && (*str).at(offset+1)!=" ")
-		{
-			tokenLength = find_first_of( "\"", offset);
-		}
-		return tokenLength;
-	}
 
 
 	//write out the functions for deleting comments and trimming whitespaces.

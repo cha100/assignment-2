@@ -107,7 +107,20 @@ void Tokenizer::prepareNextToken(){ }
 //Sets the current string to be tokenized
 //Resets all Tokenizer state variables
 //Calls Tokenizer::prepareNextToken() as the last statement before returning.
-void Tokenizer::setString(string *str) { }
+void Tokenizer::setString(string *str) 
+{
+	this -> str = str; // sets the value of string to the str variable in the Tokenizer class
+	
+	processingInlineComment = false;
+	processingBlockComment = false;
+	processingIncludeStatement = false;
+	complete = false;
+	offset = 0;
+	tokenLength = 0;
+	str = NULL;
+	prepareNextToken();
+	
+}
 
 //Returns the next token. Hint: consider the substr function
 //Updates the tokenizer state

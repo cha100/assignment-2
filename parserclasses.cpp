@@ -126,4 +126,10 @@ void Tokenizer::setString(string *str)
 //Updates the tokenizer state
 //Updates offset, resets tokenLength, updates processingABC member variables
 //Calls Tokenizer::prepareNextToken() as the last statement before returning.
-string Tokenizer::getNextToken() { }
+string Tokenizer::getNextToken() 
+{ 
+	string newString = str -> substr(offset, tokenLength) //creates substring at position offset and length tokenLength
+	offset = offset+tokenLength //updates offset
+	tokenLength = 0; // resets token length
+	return newString;
+}

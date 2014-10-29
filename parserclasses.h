@@ -5,15 +5,12 @@
 //Use only the string library DO NOT add any other libraries
 #include <string>
 
+/****************************************************************DELETTTE*/
+#include<iostream>
+
 using namespace std;
 
 //Declare your variables for storing delimiters here:
-const string paranths = "()";
-const string braces = "{}";
-const string bracks = "[]";
-const string angBracks = "<>";
-const string dquote = "\"\"";
-const string squote = "\'\'";
 
 //Token class for a doubly-linked list of string tokens
 class Token {
@@ -21,50 +18,50 @@ private:
 	Token *next; //Next pointer for doubly linked list
 	Token *prev; //Previous pointer for doubly linked list
 	string stringRep; //Token value
-	 
+
 	//Allow TokenList class to access Token member variables marked private
 	friend class TokenList;
 
 public:
 	//Default Constructor, pointers initialized to NULL
 	Token() : next(NULL), prev(NULL) { }
-		
+
 	//Constructor with string initialization, pointers initialized to NULL
 	Token(const string &stringRep) : next(NULL), prev(NULL), stringRep(stringRep) { }
 
 	//Returns the Token's *next member 
-	Token* getNext ( ) const 
+	Token* getNext() const
 	{
 		return next;  //Gets the value of next
 	}
 
 	//Sets the Token's *next member
-	void setNext (Token* next ) 
+	void setNext(Token* next)
 	{
-		this -> next = next; // pointer pointing to itself, which is the value of next
+		this->next = next; // pointer pointing to itself, which is the value of next
 	}
 
 	//Returns the Token's *prev member 
-	Token* getPrev ( ) const 
+	Token* getPrev() const
 	{
 		return prev; //Gets the value of the last
 	}
 
 	//Sets the Token's *prev member
-	void setPrev (Token* prev )
+	void setPrev(Token* prev)
 	{
-		this -> prev = prev; //this operator is a pointer which points to itself
+		this->prev = prev; //this operator is a pointer which points to itself
 	}
 
 	//Returns a reference to the Token's stringRep member variable
-	const string& getStringRep ( ) const 
+	const string& getStringRep() const
 	{
-		return (this -> stringRep); //returns a pointer pointing the address of stringRep
+		return (this->stringRep); //returns a pointer pointing the address of stringRep
 	}
 
 	//Sets the token's stringRep variable
-	void setStringRep (const string& stringRep ) 
-	{ 
+	void setStringRep(const string& stringRep)
+	{
 		next->stringRep = stringRep; //sets the value of the next token
 	}
 };
@@ -74,19 +71,20 @@ class TokenList {
 private:
 	Token *head; //Points to the head of the token list (doubly linked)
 	Token *tail; //Points to the tail of the function list (doubly linked)
-	
+
 public:
 	//Default Constructor, Empty list with pointers initialized to NULL
 	TokenList() : head(NULL), tail(NULL) { }
-	
+
 	//Returns a pointer to the head of the list
-	Token* getFirst() const 
+	Token* getFirst() const
 	{
+		cout<< " in getrist" << endl;
 		return head;  //points to the head of the list
 	}
 
 	//Returns a pointer to the tail of the list
-	Token* getLast() const 
+	Token* getLast() const
 	{
 		return tail;  //points to the tail of this list
 	}
@@ -95,13 +93,13 @@ public:
 	//Appends this new token to the TokenList
 	//On return from the function, it will be the last token in the list
 	void append(const string &str);	//example comment
-	
+
 
 	//Appends the token to the TokenList if not null
 	//On return from the function, it will be the last token in the list
 	void append(Token *token);
 
-    //Removes the token from the linked list if it is not null
+	//Removes the token from the linked list if it is not null
 	//Deletes the token
 	//On return from function, head, tail and the prev and next Tokens (in relation to the provided token) may be modified.
 	void deleteToken(Token *token);
@@ -115,50 +113,76 @@ private:
 	bool processingBlockComment;  //True if processing a Block Comment /* */
 	bool processingIncludeStatement; //True if processing an include statement <> ""
 	bool complete; //True if finished processing the current string
-	
+
 	size_t offset; //Current position in string
 	size_t tokenLength; //Current token length
 	string *str; //A pointer to the current string being processed
 
 	//Include any helper functions here
 	//e.g. trimming whitespace, comment processing
-	
+
+
+/*
+	int isLibrary()
+	{
+		int temp = 0;
+		if(str->at(offset) == '<' && str->at(offset+1)!=' ') //checks for < and the next character, if its not a space, searches for the closing >
+		{
+			
+			temp = string::find_first_of ( '>', offset);
+			//what happens if not found;
+		}
+		
+		for(int i =str->at(offset); i < str->at(temp+offset); i++) // checks all the characters searching for ;. if none found returns token length, change value of tokenLength to 0
+		{
+			if(i == ';')
+			{
+				tokenLength = 0;
+			}
+			else
+			{
+				tokenLength = temp-offset;
+			}
+		}
+		
+		return tokenLength;
+	}
+	*/
+
 	void isWhitespace()
 	{
-		while ( offset < str -> length() && (str->at (offset) == ' '|| str->at (offset) == ' \t'))
+		while ( offset < str -> length() && (str->at (offset) == ' '|| str->at (offset) == '\t'))
 		{
 			offset++;
 		}
 	}
-
-
+	/*
 	void isComment()
 	{
-		if(*str.at(offset) == "/" && (*str).at(offset+1)!="/") //Not sure how to implement this.
+		if(str->at(offset) == '/' && str->at(offset+1)!='/'); //Not sure how to implement this.;
 	}
-	
 
+	int isHeader()
+	{
+		if(str->at(offset) == '\"' && str->at(offset+1)!=' ')
+		{
+			tokenLength = string::str.(find_first_of( '\"', offset));
+		}
+		return tokenLength;
+	}
+	*/
 
-	//write out the functions for deleting comments and trimming whitespaces.
 	
 	//Computes a new tokenLength for the next token
 	//Modifies: size_t tokenLength, and bool complete
 	//(Optionally): may modify offset
 	//Does NOT modify any other member variable of Tokenizer
 	void prepareNextToken();
-	
+
 public:
 	//Default Constructor- YOU need to add the member variable initializers.
-	Tokenizer()
-	{  
-		processingInlineComment = false;
-		processingBlockComment = false;
-		processingIncludeStatement = false; 
-		complete = false;
-		offset;
-		tokenLength; 
-		str = NULL;
-	};
+	Tokenizer() : processingInlineComment(false), processingBlockComment(false), processingIncludeStatement(false), complete(false), offset(0), tokenLength(0), str(NULL)
+	{ /*Add initializers */};
 
 	//Sets the current string to be tokenized
 	//Resets all Tokenizer state variables
@@ -166,8 +190,8 @@ public:
 	void setString(string *str);
 
 	//Returns true if all possible tokens have been extracted from the current string (string *str)
-	bool isComplete() const 
-	{ /*Fill in implementation */ 
+	bool isComplete() const
+	{
 		return complete;
 	}
 

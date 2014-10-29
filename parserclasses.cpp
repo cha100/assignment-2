@@ -10,14 +10,14 @@
 //Creates a new token for the string input, str
 //Appends this new token to the TokenList
 //On return from the function, it will be the last token in the list
-void TokenList::append(const string &str) 
-{ 
+void TokenList::append(const string &str)
+{
 	Token *newNode = new Token(str);
 
 	//empty 
-	if(head == NULL && tail == NULL)
+	if (head == NULL && tail == NULL)
 	{
-		newNode = head;
+		head = newNode ;
 		tail = head;
 	}
 	else
@@ -25,21 +25,21 @@ void TokenList::append(const string &str)
 		newNode->next = NULL;
 		newNode->prev = tail;
 		tail->next = newNode;
-		tail = newNode;
-	}		
+		tail = newNode ;
+	}
 }
 
 //Appends the token to the TokenList if not null
 //On return from the function, it will be the last token in the list
-void TokenList::append(Token *token) 
-{ 
+void TokenList::append(Token *token)
+{
 	/* Has access to:
 	Token *next; //Next pointer for doubly linked list
 	Token *prev; //Previous pointer for doubly linked list
 	string stringRep; //Token value
 	*/
-		//empty
-	if(head == NULL && tail == NULL)
+	//empty
+	if (head == NULL && tail == NULL)
 	{
 		head = token;
 		tail = head;
@@ -50,9 +50,9 @@ void TokenList::append(Token *token)
 		token->prev = tail;
 		tail->next = token;
 		tail = token;
-	}		
-		
-	
+	}
+
+
 }
 
 //Removes the token from the linked list if it is not null
@@ -61,22 +61,22 @@ void TokenList::append(Token *token)
 void TokenList::deleteToken(Token *token)
 {
 	//Has access to: Token *next; //Next pointer for doubly linked list, Token *prev; //Previous pointer for doubly linked list, string stringRep; //Token value
-	
+
 	//error checking
-	if(head ==NULL && tail == NULL)
+	if (head == NULL && tail == NULL)
 	{
-		cout<< "List is empty, nothing to delete. so fuck you";
+		cout << "List is empty, nothing to delete. so fuck you";
 		return;
 	}
-	
+
 	//Head
-	else if(token == head)
+	else if (token == head)
 	{
 		token->next->prev = NULL; //sets the next tokens previous link to null
 		head = token->next; //sets the head to the next token
 		delete token; //deletes the node
 	}
-	
+
 	//Tail
 	else if (token == tail)
 	{
@@ -84,15 +84,14 @@ void TokenList::deleteToken(Token *token)
 		tail = token->prev; // sets the tail to be the previous node
 		delete token; //deletes the node
 	}
+
 	//Body
 	else
 	{
-		token->prev -> next = token ->next; //sets the previous tokens next link to the next link of the current node
+		token->prev->next = token->next; //sets the previous tokens next link to the next link of the current node
 		token->next->prev = token->prev; //sets the next nodes previous link to the previous link of the current node
 		delete token; //deletes the node
 	}
-	
-
 }
 
 
@@ -113,10 +112,19 @@ void Tokenizer::prepareNextToken()
 		return;
 	}
 	
-	if ((*str).at(offset >65) && (*str).at(offset<90) || (*str).at(offset >97) && (*str).at(offset<122))
+	if ((*str).at(offset >=65) && (*str).at(offset<=90) || (*str).at(offset >=97) && (*str).at(offset<=122))
 	{
 		temp = str->find_first_of(" ", offset);
-		tokenLength = temp-offset -1; //-4 to not include space;
+		tokenLength = temp-offset -1; //-1 to not include space;
+	}
+	
+	
+	//checks for numbers
+	
+	if ((*str).at(offset >=48) && (*str).at(offset<57))
+	{
+		temp = str->find_first_of(" ", offset);
+		tokenLength = temp-offset -1; //-1 to not include space;
 	}
 		
 	
@@ -186,7 +194,7 @@ void Tokenizer::prepareNextToken()
 		return;
 	}
 	
-	// <. <<. <=, <<+
+	// <. <<. <=, <<=
 	else if((*str).at(offset) == '<')
 	{
 		if((*str).at(offset+1) == '<' || (*str).at(offset+1) == '=' )
@@ -366,7 +374,6 @@ void Tokenizer::prepareNextToken()
 	
 }
 
-
 //Sets the current string to be tokenized
 //Resets all Tokenizer state variables
 //Calls Tokenizer::prepareNextToken() as the last statement before returning.
@@ -382,17 +389,20 @@ void Tokenizer::setString(string *str)
 	tokenLength = 0;
 	str = NULL;
 	prepareNextToken();
-	
 }
 
 //Returns the next token. Hint: consider the substr function
 //Updates the tokenizer state
 //Updates offset, resets tokenLength, updates processingABC member variables
 //Calls Tokenizer::prepareNextToken() as the last statement before returning.
-string Tokenizer::getNextToken() 
+string Tokenizer::getNextToken()
 { 
-	string newString = str -> substr(offset, tokenLength) //creates substring at position offset and length tokenLength
-	offset = offset+tokenLength //updates offset
-	tokenLength = 0; // resets token length
-	return newString;
-}
+
+	string newString = str -> substr(offset, tokenLength); //creates substring at position offset and length tokenLength
+	//tokenLength = 0;
+	prepareNextToken();
+	return newString;	
+	
+
+} 
+

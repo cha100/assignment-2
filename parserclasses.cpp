@@ -25,7 +25,7 @@ void TokenList::append(const string &str)
 		newNode->next = NULL;
 		newNode->prev = tail;
 		tail->next = newNode;
-		newNode = tail;
+		tail = newNode;
 	}		
 }
 
@@ -102,7 +102,270 @@ void TokenList::deleteToken(Token *token)
 //Modifies: size_t tokenLength, and bool complete
 //(Optionally): may modify offset
 //Does NOT modify any other member variable of Tokenizer
-void Tokenizer::prepareNextToken(){ }
+void Tokenizer::prepareNextToken()
+{
+	int temp = 0;
+	isWhitespace();
+	
+	if(offset == -1)
+	{
+		complete = true;
+		return;
+	}
+	
+	if ((*str).at(offset >65) && (*str).at(offset<90) || (*str).at(offset >97) && (*str).at(offset<122))
+	{
+		temp = str->find_first_of(" ", offset);
+		tokenLength = temp-offset -1; //-4 to not include space;
+	}
+		
+	
+		
+	//Double Cases
+	
+	// /, //, /*
+	if((*str).at(offset) == '/')
+	{
+		if(str->at(offset+1) == '/' || str->at(offset+1) ==  '*')
+		{
+			tokenLength = 2;
+		}
+		else
+		{
+			tokenLength = 1;
+
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// &, && , &=
+	else if((*str).at(offset) == '&')
+	{
+		if((str->at(offset+1) == '&' || str->at(offset+1) ==  '='))
+		{
+			tokenLength = 2 ;
+
+		}
+		else
+		{
+			tokenLength == 1;
+		}
+		offset = offset+tokenLength;
+
+		return;
+	}
+	
+	// |, ||, |=
+	else if((*str).at(offset) == '|')
+	{
+		if((*str).at(offset+1) == '|' || (*str).at(offset+1) ==  '=')
+		{
+			tokenLength = 2 ;
+		}
+		else
+		{
+			tokenLength =1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	//=, ==
+	else if((*str).at(offset) == '=')
+	{
+		if((*str).at(offset+1) == '=' )
+		{
+			tokenLength = 2 ;
+		}
+		else
+		{
+		tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// <. <<. <=, <<+
+	else if((*str).at(offset) == '<')
+	{
+		if((*str).at(offset+1) == '<' || (*str).at(offset+1) == '=' )
+		{
+			if ((*str).at(offset+1) == '<' && (*str).at(offset+2) == '=' )
+			{
+				tokenLength = 3;
+			}
+			else
+			{
+				tokenLength = 2 ;
+			}
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// >, >>, >=,  >>=
+	else if((*str).at(offset) == '>')
+	{
+		if((*str).at(offset+1) == '>' || (*str).at(offset+1) ==  '=' )
+		{
+			if ((*str).at(offset+1) == '>'  && (*str).at(offset+2) ==  '=')
+			{
+				tokenLength = 3;
+			}
+			else
+			{
+				tokenLength = 2 ;
+			}
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// !, !=
+	else if((*str).at(offset) == '!')
+	{
+		if((*str).at(offset+1) ==  '=' )
+		{
+			tokenLength = 2;
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	
+	//+, ++, +=
+	else if((*str).at(offset) == '+')
+	{
+		if((*str).at(offset+1) ==  '+' || (*str).at(offset+1) ==  '=' )
+		{
+			tokenLength = 2;
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// -, --, ->, ->*
+	else if((*str).at(offset) == '-')
+	{
+		if((*str).at(offset+1) == '-' || (*str).at(offset+1) ==  '=' || (*str).at(offset+1) ==  '>' )
+		{
+			if ((*str).at(offset+1) == '>' && (*str).at(offset+2) == '*' )
+			{
+				tokenLength = 3;
+			}
+			else
+			{
+				tokenLength = 2 ;
+			}
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	//*, *=
+	else if((*str).at(offset) == '*')
+	{
+		if((*str).at(offset+1) == '=' )
+		{
+			tokenLength = 2;
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// :. ::
+	else if((*str).at(offset) == ':')
+	{
+		if((*str).at(offset+1) == ':' )
+		{
+			tokenLength = 2;
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// ^, ^=
+	else if((*str).at(offset) == '^')
+	{
+		if((*str).at(offset+1) == '=' )
+		{
+			tokenLength = 2;
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// %, %=
+	else if((*str).at(offset) == '%')
+	{
+		if((*str).at(offset+1) == '=' )
+		{
+			tokenLength = 2;
+		}
+		else
+		{
+			tokenLength = 1;
+		}
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	// (,),[,],{,},;.'.',~
+	else if((*str).at(offset) == '(' || (*str).at(offset) == ')' || (*str).at(offset) == '[' || (*str).at(offset) == ']' || (*str).at(offset) == '{' || (*str).at(offset) == '}' 
+				||(*str).at(offset) == ';' || (*str).at(offset) == '\'' || (*str).at(offset) == '\'' || (*str).at(offset) == '~' ||  (*str).at(offset) == '#' )
+	{
+		tokenLength =1;
+		offset = offset+tokenLength;
+		return;
+	}
+	
+	else if ((*str).at(offset-2)== '#')
+	{
+		temp;
+		temp = str->find_first_of( " ", offset);
+		tokenLength = temp-offset;
+	}
+		
+		
+	complete = true;
+	return;
+
+	
+}
+
 
 //Sets the current string to be tokenized
 //Resets all Tokenizer state variables

@@ -8,12 +8,12 @@
 using namespace std;
 
 //Declare your variables for storing delimiters here:
-string paranths = "()";
-string braces = "{}";
-string bracks = "[]";
-string angBracks = "<>";
-string dquote = "\"\"";
-string squote = "\'\'";
+const string paranths = "()";
+const string braces = "{}";
+const string bracks = "[]";
+const string angBracks = "<>";
+const string dquote = "\"\"";
+const string squote = "\'\'";
 
 //Token class for a doubly-linked list of string tokens
 class Token {

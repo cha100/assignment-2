@@ -103,28 +103,32 @@ void TokenList::deleteToken(Token *token)
 //Does NOT modify any other member variable of Tokenizer
 void Tokenizer::prepareNextToken()
 {
+	//cout<< " in top of prepare next token" << endl;
 	int temp = 0;
 	isWhitespace();
+
 	
-	if(offset == -1)
+	if(offset < 0 || (offset > str -> length()))
 	{
 		complete = true;
 		return;
 	}
 	
-	if ((*str).at(offset >=65) && (*str).at(offset<=90) || (*str).at(offset >=97) && (*str).at(offset<=122))
+	else if ((*str).at(offset >=65) && (*str).at(offset<=90) || (*str).at(offset >=97) && (*str).at(offset<=122))
 	{
 		temp = str->find_first_of(" ", offset);
 		tokenLength = temp-offset -1; //-1 to not include space;
+		return;
 	}
 	
 	
 	//checks for numbers
 	
-	if ((*str).at(offset >=48) && (*str).at(offset<57))
+	else if ((*str).at(offset >=48) && (*str).at(offset<57))
 	{
 		temp = str->find_first_of(" ", offset);
 		tokenLength = temp-offset -1; //-1 to not include space;
+		return;
 	}
 		
 	
@@ -132,7 +136,7 @@ void Tokenizer::prepareNextToken()
 	//Double Cases
 	
 	// /, //, /*
-	if((*str).at(offset) == '/')
+	else if((*str).at(offset) == '/')
 	{
 		if(str->at(offset+1) == '/' || str->at(offset+1) ==  '*')
 		{
@@ -367,6 +371,7 @@ void Tokenizer::prepareNextToken()
 		tokenLength = temp-offset;
 	}
 		
+	cout<< " in end of getNExtToken" << endl;
 		
 	complete = true;
 	return;
@@ -389,6 +394,7 @@ void Tokenizer::setString(string *str)
 	tokenLength = 0;
 	str = NULL;
 	prepareNextToken();
+	cout<< " in setString" << endl;
 }
 
 //Returns the next token. Hint: consider the substr function
@@ -400,8 +406,12 @@ string Tokenizer::getNextToken()
 
 	string newString = str -> substr(offset, tokenLength); //creates substring at position offset and length tokenLength
 	//tokenLength = 0;
+	cout<< " Im newString" << endl;
+	
 	prepareNextToken();
+
 	return newString;	
+	cout<< " in getNextToken" << endl;
 	
 
 } 

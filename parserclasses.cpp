@@ -1,502 +1,173 @@
-//Use only the following libraries:
-#include "parserClasses.h"
+
+#ifndef PARSERCLASSES_H_
+#define PARSERCLASSES_H_
+
+//Use only the string library DO NOT add any other libraries
 #include <string>
-#include <iostream> //REMEMEBER TO DELETE THIS
 
-//Complete the implementation of the following member functions:
+/****************************************************************DELETTTE*/
+#include<iostream>
 
-//****TokenList class function definitions******
+using namespace std;
 
-//Creates a new token for the string input, str
-//Appends this new token to the TokenList
-//On return from the function, it will be the last token in the list
-void TokenList::append(const string &str)
-{
-	Token *newNode = new Token(str);
+//Declare your variables for storing delimiters here:
+const char quotes = '\"';
+const string blckcmmt = "*/";
+const string allDaThings = "abcdefghijklmnopqrstvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-=+/,.\\<>?|[]{}~` \"" ;
 
-	//empty 
-	if (head == NULL && tail == NULL)
-	{
-		head = newNode ;
-		tail = head;
-	}
-	else
-	{
-		newNode->next = NULL;
-		newNode->prev = tail;
-		tail->next = newNode;
-		tail = newNode ;
-	}
-}
-
-//Appends the token to the TokenList if not null
-//On return from the function, it will be the last token in the list
-void TokenList::append(Token *token)
-{
-	/* Has access to:
+//Token class for a doubly-linked list of string tokens
+class Token {
+private:
 	Token *next; //Next pointer for doubly linked list
 	Token *prev; //Previous pointer for doubly linked list
 	string stringRep; //Token value
-	*/
-	//empty
-	if (head == NULL && tail == NULL)
+
+	//Allow TokenList class to access Token member variables marked private
+	friend class TokenList;
+
+public:
+	//Default Constructor, pointers initialized to NULL
+	Token() : next(NULL), prev(NULL) { }
+
+	//Constructor with string initialization, pointers initialized to NULL
+	Token(const string &stringRep) : next(NULL), prev(NULL), stringRep(stringRep) { }
+
+	//Returns the Token's *next member 
+	Token* getNext() const
 	{
-		head = token;
-		tail = head;
-	}
-	else
-	{
-		token->next = NULL;
-		token->prev = tail;
-		tail->next = token;
-		tail = token;
-	}
-
-
-}
-
-//Removes the token from the linked list if it is not null
-//Deletes the token
-//On return from function, head, tail and the prev and next Tokens (in relation to the provided token) may be modified.
-void TokenList::deleteToken(Token *token)
-{
-	//Has access to: Token *next; //Next pointer for doubly linked list, Token *prev; //Previous pointer for doubly linked list, string stringRep; //Token value
-
-	//error checking
-	if (head == NULL && tail == NULL)
-	{
-		cout << "List is empty, nothing to delete. so fuck you";
-		return;
+		return next;  //Gets the value of next
 	}
 
-	//Head
-	else if (token == head)
+	//Sets the Token's *next member
+	void setNext(Token* next)
 	{
-		token->next->prev = NULL; //sets the next tokens previous link to null
-		head = token->next; //sets the head to the next token
-		delete token; //deletes the node
+		this->next = next; // pointer pointing to itself, which is the value of next
 	}
 
-	//Tail
-	else if (token == tail)
+	//Returns the Token's *prev member 
+	Token* getPrev() const
 	{
-		token->prev->next = NULL; //makes the next link of the previous node null
-		tail = token->prev; // sets the tail to be the previous node
-		delete token; //deletes the node
+		return prev; //Gets the value of the last
 	}
 
-	//Body
-	else
+	//Sets the Token's *prev member
+	void setPrev(Token* prev)
 	{
-		token->prev->next = token->next; //sets the previous tokens next link to the next link of the current node
-		token->next->prev = token->prev; //sets the next nodes previous link to the previous link of the current node
-		delete token; //deletes the node
-	}
-}
-
-
-//****Tokenizer class function definitions******
-
-//Computes a new tokenLength for the next token
-//Modifies: size_t tokenLength, and bool complete
-//(Optionally): may modify offset
-//Does NOT modify any other member variable of Tokenizer
-void Tokenizer::prepareNextToken()
-{
-	//cout<< " in top of prepare next token" << endl;
-	int temp = 0;
-
-	//removes whitespace
-	isWhitespace();
-
-	//Checks for overflow
-	if(offset < 0 || (offset >= str -> length()))
-	{
-		complete = true; 
-		return;
+		this->prev = prev; //this operator is a pointer which points to itself
 	}
 
-	//if processingIncludeStatement is on, makes the <...> strings and "..."
-	if(processingIncludeStatement)
+	//Returns a reference to the Token's stringRep member variable
+	const string& getStringRep() const
 	{
-		if(str->at(offset) == '<')
+		return (this->stringRep); //returns a pointer pointing the address of stringRep
+	}
+
+	//Sets the token's stringRep variable
+	void setStringRep(const string& stringRep)
+	{
+		next->stringRep = stringRep; //sets the value of the next token
+	}
+};
+
+//A doubly-linked list class consisting of Token elements
+class TokenList {
+private:
+	Token *head; //Points to the head of the token list (doubly linked)
+	Token *tail; //Points to the tail of the function list (doubly linked)
+
+public:
+	//Default Constructor, Empty list with pointers initialized to NULL
+	TokenList() : head(NULL), tail(NULL) { }
+
+	//Returns a pointer to the head of the list
+	Token* getFirst() const
+	{
+		return head;  //points to the head of the list
+	}
+
+	//Returns a pointer to the tail of the list
+	Token* getLast() const
+	{
+		return tail;  //points to the tail of this list
+	}
+
+	//Creates a new token for the string input, str
+	//Appends this new token to the TokenList
+	//On return from the function, it will be the last token in the list
+	void append(const string &str);	//example comment
+
+
+	//Appends the token to the TokenList if not null
+	//On return from the function, it will be the last token in the list
+	void append(Token *token);
+
+	//Removes the token from the linked list if it is not null
+	//Deletes the token
+	//On return from function, head, tail and the prev and next Tokens (in relation to the provided token) may be modified.
+	void deleteToken(Token *token);
+};
+
+//A class for tokenizing a string of C++  code into tokens
+class Tokenizer {
+private:
+	/*State tracking variables for processing a single string*/
+	bool processingInlineComment; //True if processing an In-line comment //
+	bool processingBlockComment;  //True if processing a Block Comment /* */
+	bool processingIncludeStatement; //True if processing an include statement <> ""
+	bool processingPound; // True if processing a #
+	bool complete; //True if finished processing the current string
+
+	size_t offset; //Current position in string
+	size_t tokenLength; //Current token length
+	string *str; //A pointer to the current string being processed
+
+	//Include any helper functions here
+	//e.g. trimming whitespace, comment processing
+
+
+	void isWhitespace()
+	{
+		while ( offset < str -> length() && (str->at (offset) == ' '|| str->at (offset) == '\t'))
 		{
-			temp = str->find_first_of(">", offset);
-			tokenLength = temp - offset;
-			offset = offset+tokenLength; 
-		}
-		else if(str->at(offset) == quotes)
-		{
-			temp = str->find_first_of(quotes, offset);
-			tokenLength = temp - offset;
-			offset = offset+tokenLength; 
+			offset++;
 		}
 	}
+
 
 	
-	//uses ascii characters (65-90 checks capital case characters A-Z & 97-122 checks lower case characters a-z)
-	else if ((str->at(offset) >=65) && (str->at(offset)<=90) || (str->at(offset) >=97) && (str->at(offset)<=122))
-	{
+	//Computes a new tokenLength for the next token
+	//Modifies: size_t tokenLength, and bool complete
+	//(Optionally): may modify offset
+	//Does NOT modify any other member variable of Tokenizer
+	void prepareNextToken();
 
-		temp = str->find_first_of(" ;,", offset);
-		tokenLength = temp - offset;
-		offset = offset+tokenLength; 
-		return;
-		
-	}
-	
-	
-	//checks for numbers (Ascii code 48-57 represents integers 0-9)
-	
-	else if (str->at(offset) >=48 && (str->at(offset)<=57))
+public:
+	//Default Constructor- YOU need to add the member variable initializers.
+	Tokenizer() : processingInlineComment(false), processingBlockComment(false), processingIncludeStatement(false), complete(false), offset(0), tokenLength(0), str(NULL)
 	{
-
-		temp = str->find_first_of(" ;,", offset);
-		tokenLength = temp - offset;
-		offset = offset+tokenLength; 
-		return;
-	}
-	
-		
-	//Double and Triple Cases
-	
-	// /, //, /*
-	else if(str->at(offset) == '/')
-	{
-		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '/' || str->at(offset+1) ==  '*'))
-		{
-			tokenLength = 2;
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-
-	else if(processingInlineComment)
-	{
-		
-		temp = str->find_first_of("\0", offset);
-
-		tokenLength = temp - offset;
-		offset = offset+tokenLength; 
-	}
-	else if(processingBlockComment)
-	{
-		int temp1 = 0;
-		int temp2 = 0;
-		temp1 = str->find_first_of("\0", offset);
-		while (str->at(offset) != '\0')
-		{
-			temp2 = str->find_first_of(blckcmmt, offset);
-		}
-		//compares the position of the found string items "*/" and sets the token length with temp variables
-		if (temp1>temp2)
-		{
-			temp = temp2;
-		}
-		else
-		{
-			temp = temp1;
-		}
-		tokenLength = temp - offset;
-		offset = offset+tokenLength; 
-	}
-
-	
-	// &, && , &=
-	else if(str->at(offset) == '&')
-	{
-
-		if(str->at(offset+1)!='\0' && ((str->at(offset+1) == '&' || str->at(offset+1) ==  '=')))
-		{
-			tokenLength = 2 ;
-
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-
-		return;
-	}
-	
-	// |, ||, |=
-	else if(str->at(offset) == '|')
-	{
-		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '|' || str->at(offset+1) ==  '='))
-		{
-			tokenLength = 2 ;
-		}
-		else
-		{
-			tokenLength =1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	//=, ==
-	else if(str->at(offset) == '=')
-	{
-		if(str->at(offset+1)!='\0' && str->at(offset+1) == '=' )
-		{
-			tokenLength = 2 ;
-		}
-		else
-		{
-		tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	// <. <<. <=, <<=
-	else if(str->at(offset) == '<')
-	{
-		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '<' || str->at(offset+1) == '=' ))
-		{
-			if (str->at(offset+2)!='\0' && str->at(offset+1) == '<' && str->at(offset+2) == '=' )
-			{
-				tokenLength = 3;
-			}
-			else
-			{
-				tokenLength = 2 ;
-			}
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	// >, >>, >=,  >>=
-	else if(str->at(offset) == '>')
-	{
-		if(str->at(offset+1)!='\0' &&  (str->at(offset+1) == '>' || str->at(offset+1) ==  '=' ))
-		{
-			if (str->at(offset+2)!='\0' && str->at(offset+1) == '>'  && str->at(offset+2) ==  '=')
-			{
-				tokenLength = 3;
-			}
-			else
-			{
-				tokenLength = 2 ;
-			}
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	// !, !=
-	else if(str->at(offset) == '!')
-	{
-		if(str->at(offset+1)!='\0' && str->at(offset+1) ==  '=' )
-		{
-			tokenLength = 2;
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	
-	//+, ++, +=
-	else if(str->at(offset) == '+')
-	{
-		if(str->at(offset+1)!='\0' && (str->at(offset+1) ==  '+' || str->at(offset+1) ==  '=' ))
-		{
-			tokenLength = 2;
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	// -, --, ->, ->*
-	else if(str->at(offset) == '-')
-	{
-		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '-' || str->at(offset+1) ==  '=' || str->at(offset+1) ==  '>' ))
-		{
-			if (str->at(offset+2)!='\0' && str->at(offset+1) == '>' && str->at(offset+2) == '*' )
-			{
-				tokenLength = 3;
-			}
-			else
-			{
-				tokenLength = 2 ;
-			}
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	//*, *=, */ 
-	else if(str->at(offset) == '*')
-	{
-		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '='  || str->at(offset+1) == '/' ))
-		{
-			tokenLength = 2;
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	// :. ::
-	else if(str->at(offset) == ':')
-	{
-		if(str->at(offset+1)!='\0' && str->at(offset+1) == ':' )
-		{
-			tokenLength = 2;
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	// ^, ^=
-	else if(str->at(offset) == '^')
-	{
-		if(str->at(offset+1)!='\0' && str->at(offset+1) == '=' )
-		{
-			tokenLength = 2;
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	// %, %=
-	else if(str->at(offset) == '%')
-	{
-		if(str->at(offset+1)!='\0' && str->at(offset+1) == '=' )
-		{
-			tokenLength = 2;
-		}
-		else
-		{
-			tokenLength = 1;
-		}
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	// (,),[,],{,},;.'.',~,_
-	else if(str->at(offset) == '(' || str->at(offset) == ')' || str->at(offset) == '[' || str->at(offset) == ']' || str->at(offset) == '{' || str->at(offset) == '}' 
-				||str->at(offset) == ';' || str->at(offset) == '\'' || str->at(offset) == '\"' || str->at(offset) == '~' ||  str->at(offset) == '#' || str->at(offset) == ','|| str->at(offset) == '_')
-	{
-		tokenLength = 1;
-		offset = offset+tokenLength;
-		return;
-	}
-	
-	else if (offset!=0 || offset !=1 && str->at(offset-2)== '#')
-	{
-		temp = str->find_first_of(" ", offset);
-		tokenLength = temp - offset;
-		offset = offset+tokenLength; 
-	}
-		
-	//cout<< " in end of getNExtToken" << endl;
-		
-	//complete = true;
-	return;
-
-	
-}
-
-//Sets the current string to be tokenized
-//Resets all Tokenizer state variables
-//Calls Tokenizer::prepareNextToken() as the last statement before returning.
-void Tokenizer::setString(string *str) 
-{
-	this -> str = str; // sets the value of string to the str variable in the Tokenizer class
-	
-	processingInlineComment = false;
-	processingIncludeStatement = false;
-	complete = false;
-	offset = 0;
-	tokenLength = 0;
-	str = NULL;
-	prepareNextToken();
-}
-
-//Returns the next token. Hint: consider the substr function
-//Updates the tokenizer state
-//Updates offset, resets tokenLength, updates processingABC member variables
-//Calls Tokenizer::prepareNextToken() as the last statement before returning.
-string Tokenizer::getNextToken()
-{ 
-
-	string newString = str -> substr(offset-tokenLength, tokenLength); //creates substring at position offset and length tokenLength
-	//resets the flags to default false
-	processingInlineComment = false;
-	processingBlockComment = false;
-	processingIncludeStatement = false;
-
-	//checks for #
-	if (str->at(offset) == '#')
-	{
-		processingPound = true;
-	}
-	else if (processingPound == true && (newString == "include")) //checks for include if # is present
-	{
-		processingIncludeStatement = true;
 		processingPound = false;
-	}
+	};
 
-	//checks for commenting
-	
+	//Sets the current string to be tokenized
+	//Resets all Tokenizer state variables
+	//Calls Tokenizer::prepareNextToken() as the last statement before returning.
+	void setString(string *str);
 
-	if(newString == "//")
+	//Returns true if all possible tokens have been extracted from the current string (string *str)
+	bool isComplete() const
 	{
-		processingInlineComment = true;
-	}
-	if(newString == "/*")
-	{
-		processingBlockComment = true;
-	}
-	if(newString == "*/" && processingBlockComment)
-	{                                                                                                                   
-		processingBlockComment = false;
+		return complete;
 	}
 
+	//Returns the next token. Hint: consider the substr function
+	//Updates the tokenizer state
+	//Updates offset, resets tokenLength, updates processingABC member variables
+	//Calls Tokenizer::prepareNextToken() as the last statement before returning.
+	string getNextToken();
+};
 
-	prepareNextToken();
 
-	return newString;	
 
-	
 
-} 
+#endif /* PARSERCLASSES_H_ */
 

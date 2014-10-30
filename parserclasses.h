@@ -11,6 +11,8 @@
 using namespace std;
 
 //Declare your variables for storing delimiters here:
+const char quotes = '\"';
+const string blckcmmt = "*/";
 
 //Token class for a doubly-linked list of string tokens
 class Token {
@@ -79,7 +81,6 @@ public:
 	//Returns a pointer to the head of the list
 	Token* getFirst() const
 	{
-		cout<< " in getrist" << endl;
 		return head;  //points to the head of the list
 	}
 
@@ -112,6 +113,7 @@ private:
 	bool processingInlineComment; //True if processing an In-line comment //
 	bool processingBlockComment;  //True if processing a Block Comment /* */
 	bool processingIncludeStatement; //True if processing an include statement <> ""
+	bool processingPound; // True if processing a #
 	bool complete; //True if finished processing the current string
 
 	size_t offset; //Current position in string
@@ -182,7 +184,9 @@ private:
 public:
 	//Default Constructor- YOU need to add the member variable initializers.
 	Tokenizer() : processingInlineComment(false), processingBlockComment(false), processingIncludeStatement(false), complete(false), offset(0), tokenLength(0), str(NULL)
-	{ /*Add initializers */};
+	{
+		processingPound = false;
+	};
 
 	//Sets the current string to be tokenized
 	//Resets all Tokenizer state variables

@@ -105,63 +105,119 @@ void Tokenizer::prepareNextToken()
 {
 	//cout<< " in top of prepare next token" << endl;
 	int temp = 0;
+
+	//removes whitespace
 	isWhitespace();
 
-	
-	if(offset < 0 || (offset > str -> length()))
+	//Checks for overflow
+	if(offset < 0 || (offset >= str -> length()))
 	{
-		complete = true;
+		complete = true; 
 		return;
 	}
-	
-	else if ((*str).at(offset >=65) && (*str).at(offset<=90) || (*str).at(offset >=97) && (*str).at(offset<=122))
+
+	//if processingIncludeStatement is on, makes the <...> strings and "..."
+	if(processingIncludeStatement)
 	{
-		temp = str->find_first_of(" ", offset);
-		tokenLength = temp-offset -1; //-1 to not include space;
-		return;
+		if(str->at(offset) == '<')
+		{
+			temp = str->find_first_of(">", offset);
+			tokenLength = temp - offset;
+			offset = offset+tokenLength; 
+		}
+		else if(str->at(offset) == quotes)
+		{
+			temp = str->find_first_of(quotes, offset);
+			tokenLength = temp - offset;
+			offset = offset+tokenLength; 
+		}
 	}
+
 	
-	
-	//checks for numbers
-	
-	else if ((*str).at(offset >=48) && (*str).at(offset<57))
+	//uses ascii characters (65-90 checks capital case characters A-Z & 97-122 checks lower case characters a-z)
+	else if ((str->at(offset) >=65) && (str->at(offset)<=90) || (str->at(offset) >=97) && (str->at(offset)<=122))
 	{
-		temp = str->find_first_of(" ", offset);
-		tokenLength = temp-offset -1; //-1 to not include space;
+
+		temp = str->find_first_of(" ;,", offset);
+		tokenLength = temp - offset;
+		offset = offset+tokenLength; 
 		return;
-	}
 		
+	}
+	
+	
+	//checks for numbers (Ascii code 48-57 represents integers 0-9)
+	
+	else if (str->at(offset) >=48 && (str->at(offset)<=57))
+	{
+
+		temp = str->find_first_of(" ;,", offset);
+		tokenLength = temp - offset;
+		offset = offset+tokenLength; 
+		return;
+	}
 	
 		
-	//Double Cases
+	//Double and Triple Cases
 	
 	// /, //, /*
-	else if((*str).at(offset) == '/')
+	else if(str->at(offset) == '/')
 	{
-		if(str->at(offset+1) == '/' || str->at(offset+1) ==  '*')
+		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '/' || str->at(offset+1) ==  '*'))
 		{
 			tokenLength = 2;
 		}
 		else
 		{
 			tokenLength = 1;
-
 		}
 		offset = offset+tokenLength;
 		return;
 	}
+
+	else if(processingInlineComment)
+	{
+		
+		temp = str->find_first_of("\0", offset);
+
+		tokenLength = temp - offset;
+		offset = offset+tokenLength; 
+	}
+	else if(processingBlockComment)
+	{
+		int temp1 = 0;
+		int temp2 = 0;
+		temp1 = str->find_first_of("\0", offset);
+		while (str->at(offset) != '\0')
+		{
+			temp2 = str->find_first_of(blckcmmt, offset);
+		}
+		//compares the position of the found string items "*/" and sets the token length with temp variables
+		if (temp1>temp2)
+		{
+			temp = temp2;
+		}
+		else
+		{
+			temp = temp1;
+		}
+		tokenLength = temp - offset;
+		offset = offset+tokenLength; 
+	}
+
 	
 	// &, && , &=
-	else if((*str).at(offset) == '&')
+	else if(str->at(offset) == '&')
 	{
-		if((str->at(offset+1) == '&' || str->at(offset+1) ==  '='))
+
+		if(str->at(offset+1)!='\0' && ((str->at(offset+1) == '&' || str->at(offset+1) ==  '=')))
 		{
 			tokenLength = 2 ;
 
 		}
 		else
 		{
-			tokenLength == 1;
+			tokenLength = 1;
 		}
 		offset = offset+tokenLength;
 
@@ -169,9 +225,9 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	// |, ||, |=
-	else if((*str).at(offset) == '|')
+	else if(str->at(offset) == '|')
 	{
-		if((*str).at(offset+1) == '|' || (*str).at(offset+1) ==  '=')
+		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '|' || str->at(offset+1) ==  '='))
 		{
 			tokenLength = 2 ;
 		}
@@ -184,9 +240,9 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	//=, ==
-	else if((*str).at(offset) == '=')
+	else if(str->at(offset) == '=')
 	{
-		if((*str).at(offset+1) == '=' )
+		if(str->at(offset+1)!='\0' && str->at(offset+1) == '=' )
 		{
 			tokenLength = 2 ;
 		}
@@ -199,11 +255,11 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	// <. <<. <=, <<=
-	else if((*str).at(offset) == '<')
+	else if(str->at(offset) == '<')
 	{
-		if((*str).at(offset+1) == '<' || (*str).at(offset+1) == '=' )
+		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '<' || str->at(offset+1) == '=' ))
 		{
-			if ((*str).at(offset+1) == '<' && (*str).at(offset+2) == '=' )
+			if (str->at(offset+2)!='\0' && str->at(offset+1) == '<' && str->at(offset+2) == '=' )
 			{
 				tokenLength = 3;
 			}
@@ -221,11 +277,11 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	// >, >>, >=,  >>=
-	else if((*str).at(offset) == '>')
+	else if(str->at(offset) == '>')
 	{
-		if((*str).at(offset+1) == '>' || (*str).at(offset+1) ==  '=' )
+		if(str->at(offset+1)!='\0' &&  (str->at(offset+1) == '>' || str->at(offset+1) ==  '=' ))
 		{
-			if ((*str).at(offset+1) == '>'  && (*str).at(offset+2) ==  '=')
+			if (str->at(offset+2)!='\0' && str->at(offset+1) == '>'  && str->at(offset+2) ==  '=')
 			{
 				tokenLength = 3;
 			}
@@ -243,9 +299,9 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	// !, !=
-	else if((*str).at(offset) == '!')
+	else if(str->at(offset) == '!')
 	{
-		if((*str).at(offset+1) ==  '=' )
+		if(str->at(offset+1)!='\0' && str->at(offset+1) ==  '=' )
 		{
 			tokenLength = 2;
 		}
@@ -259,9 +315,9 @@ void Tokenizer::prepareNextToken()
 	
 	
 	//+, ++, +=
-	else if((*str).at(offset) == '+')
+	else if(str->at(offset) == '+')
 	{
-		if((*str).at(offset+1) ==  '+' || (*str).at(offset+1) ==  '=' )
+		if(str->at(offset+1)!='\0' && (str->at(offset+1) ==  '+' || str->at(offset+1) ==  '=' ))
 		{
 			tokenLength = 2;
 		}
@@ -274,11 +330,11 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	// -, --, ->, ->*
-	else if((*str).at(offset) == '-')
+	else if(str->at(offset) == '-')
 	{
-		if((*str).at(offset+1) == '-' || (*str).at(offset+1) ==  '=' || (*str).at(offset+1) ==  '>' )
+		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '-' || str->at(offset+1) ==  '=' || str->at(offset+1) ==  '>' ))
 		{
-			if ((*str).at(offset+1) == '>' && (*str).at(offset+2) == '*' )
+			if (str->at(offset+2)!='\0' && str->at(offset+1) == '>' && str->at(offset+2) == '*' )
 			{
 				tokenLength = 3;
 			}
@@ -295,10 +351,10 @@ void Tokenizer::prepareNextToken()
 		return;
 	}
 	
-	//*, *=
-	else if((*str).at(offset) == '*')
+	//*, *=, */ 
+	else if(str->at(offset) == '*')
 	{
-		if((*str).at(offset+1) == '=' )
+		if(str->at(offset+1)!='\0' && (str->at(offset+1) == '='  || str->at(offset+1) == '/' ))
 		{
 			tokenLength = 2;
 		}
@@ -311,9 +367,9 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	// :. ::
-	else if((*str).at(offset) == ':')
+	else if(str->at(offset) == ':')
 	{
-		if((*str).at(offset+1) == ':' )
+		if(str->at(offset+1)!='\0' && str->at(offset+1) == ':' )
 		{
 			tokenLength = 2;
 		}
@@ -326,9 +382,9 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	// ^, ^=
-	else if((*str).at(offset) == '^')
+	else if(str->at(offset) == '^')
 	{
-		if((*str).at(offset+1) == '=' )
+		if(str->at(offset+1)!='\0' && str->at(offset+1) == '=' )
 		{
 			tokenLength = 2;
 		}
@@ -341,9 +397,9 @@ void Tokenizer::prepareNextToken()
 	}
 	
 	// %, %=
-	else if((*str).at(offset) == '%')
+	else if(str->at(offset) == '%')
 	{
-		if((*str).at(offset+1) == '=' )
+		if(str->at(offset+1)!='\0' && str->at(offset+1) == '=' )
 		{
 			tokenLength = 2;
 		}
@@ -355,25 +411,25 @@ void Tokenizer::prepareNextToken()
 		return;
 	}
 	
-	// (,),[,],{,},;.'.',~
-	else if((*str).at(offset) == '(' || (*str).at(offset) == ')' || (*str).at(offset) == '[' || (*str).at(offset) == ']' || (*str).at(offset) == '{' || (*str).at(offset) == '}' 
-				||(*str).at(offset) == ';' || (*str).at(offset) == '\'' || (*str).at(offset) == '\'' || (*str).at(offset) == '~' ||  (*str).at(offset) == '#' )
+	// (,),[,],{,},;.'.',~,_
+	else if(str->at(offset) == '(' || str->at(offset) == ')' || str->at(offset) == '[' || str->at(offset) == ']' || str->at(offset) == '{' || str->at(offset) == '}' 
+				||str->at(offset) == ';' || str->at(offset) == '\'' || str->at(offset) == '\"' || str->at(offset) == '~' ||  str->at(offset) == '#' || str->at(offset) == ','|| str->at(offset) == '_')
 	{
-		tokenLength =1;
+		tokenLength = 1;
 		offset = offset+tokenLength;
 		return;
 	}
 	
-	else if ((*str).at(offset-2)== '#')
+	else if (offset!=0 || offset !=1 && str->at(offset-2)== '#')
 	{
-		temp;
-		temp = str->find_first_of( " ", offset);
-		tokenLength = temp-offset;
+		temp = str->find_first_of(" ", offset);
+		tokenLength = temp - offset;
+		offset = offset+tokenLength; 
 	}
 		
-	cout<< " in end of getNExtToken" << endl;
+	//cout<< " in end of getNExtToken" << endl;
 		
-	complete = true;
+	//complete = true;
 	return;
 
 	
@@ -387,14 +443,12 @@ void Tokenizer::setString(string *str)
 	this -> str = str; // sets the value of string to the str variable in the Tokenizer class
 	
 	processingInlineComment = false;
-	processingBlockComment = false;
 	processingIncludeStatement = false;
 	complete = false;
 	offset = 0;
 	tokenLength = 0;
 	str = NULL;
 	prepareNextToken();
-	cout<< " in setString" << endl;
 }
 
 //Returns the next token. Hint: consider the substr function
@@ -404,14 +458,44 @@ void Tokenizer::setString(string *str)
 string Tokenizer::getNextToken()
 { 
 
-	string newString = str -> substr(offset, tokenLength); //creates substring at position offset and length tokenLength
-	//tokenLength = 0;
-	cout<< " Im newString" << endl;
+	string newString = str -> substr(offset-tokenLength, tokenLength); //creates substring at position offset and length tokenLength
+	//resets the flags to default false
+	processingInlineComment = false;
+	processingBlockComment = false;
+	processingIncludeStatement = false;
+
+	//checks for #
+	if (str->at(offset) == '#')
+	{
+		processingPound = true;
+	}
+	else if (processingPound == true && (newString == "include")) //checks for include if # is present
+	{
+		processingIncludeStatement = true;
+		processingPound = false;
+	}
+
+	//checks for commenting
 	
+
+	if(newString == "//")
+	{
+		processingInlineComment = true;
+	}
+	if(newString == "/*")
+	{
+		processingBlockComment = true;
+	}
+	if(newString == "*/" && processingBlockComment)
+	{                                                                                                                   
+		processingBlockComment = false;
+	}
+
+
 	prepareNextToken();
 
 	return newString;	
-	cout<< " in getNextToken" << endl;
+
 	
 
 } 
